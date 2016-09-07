@@ -24,7 +24,7 @@ var _ editable.Editable = (*StringEditor)(nil)
 
 type StringEditor struct{}
 
-func (s *StringEditor) Format(rule *system.RuleWrapper) editable.Format {
+func (s *StringEditor) EditorFormat(rule *system.RuleWrapper) editable.Format {
 	if rule != nil {
 		if r, ok := rule.Interface.(*system.StringRule); ok && r.Long {
 			return editable.Block

@@ -37,7 +37,10 @@ func (v *PanelNavView) Reconcile(old vecty.Component) {
 
 func (v *PanelNavView) Render() vecty.Component {
 	return elem.Navigation(
-		prop.Class("navbar navbar-default navbar-static-top nagative-margin"),
+		vecty.Style("margin-top", "-15px"),
+		vecty.Style("margin-left", "-15px"),
+		vecty.Style("margin-right", "-15px"),
+		prop.Class("navbar navbar-default navbar-static-top"),
 		elem.Div(
 			prop.Class("container-fluid"),
 			elem.Div(

@@ -12,6 +12,7 @@ import (
 	"kego.io/editor/client/editable"
 	"kego.io/editor/client/models"
 	"kego.io/editor/client/stores"
+	"kego.io/editor/client/views/styles"
 	"kego.io/flux"
 	"kego.io/json"
 	"kego.io/system"
@@ -122,8 +123,8 @@ func (v *EditorListView) Render() vecty.Component {
 		}
 
 		f := editable.Branch
-		if e := models.GetEditable(v.Ctx, n); e != nil {
-			f = e.Format(n.Rule)
+		if e := models.GetEditable(v.Ctx, n, nil); e != nil {
+			f = e.EditorFormat(n.Rule)
 			if f == editable.Block || f == editable.Inline {
 				children = append(children, e.EditorView(v.Ctx, n, editable.Block))
 				return
@@ -138,7 +139,9 @@ func (v *EditorListView) Render() vecty.Component {
 						v.App.Dispatch(&actions.BranchSelecting{Branch: b, Op: models.BranchOpClickEditorLink})
 					}).PreventDefault(),
 					elem.Italic(
-						prop.Class("editor-icon editor-icon-after glyphicon glyphicon-share-alt"),
+						styles.EditorIcon(),
+						styles.MarginLeftInline(),
+						prop.Class("glyphicon glyphicon-share-alt"),
 					),
 				),
 			))

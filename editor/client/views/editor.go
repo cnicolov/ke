@@ -11,6 +11,7 @@ import (
 	"kego.io/editor/client/actions"
 	"kego.io/editor/client/models"
 	"kego.io/editor/client/stores"
+	"kego.io/editor/client/views/styles"
 	"kego.io/flux"
 	"kego.io/system"
 	"kego.io/system/node"
@@ -105,7 +106,9 @@ func (v *EditorView) Render() vecty.Component {
 				vecty.Property("aria-haspopup", "true"),
 				vecty.Property("aria-expanded", "true"),
 				elem.Italic(
-					prop.Class("editor-icon editor-icon-before glyphicon glyphicon-collapse-down"),
+					styles.EditorIcon(),
+					styles.MarginRightInline(),
+					prop.Class("glyphicon glyphicon-collapse-down"),
 				),
 			),
 			elem.UnorderedList(

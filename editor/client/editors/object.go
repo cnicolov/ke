@@ -13,6 +13,7 @@ import (
 	"kego.io/editor/client/models"
 	"kego.io/editor/client/stores"
 	"kego.io/editor/client/views"
+	"kego.io/editor/client/views/styles"
 	"kego.io/system"
 	"kego.io/system/node"
 )
@@ -21,7 +22,7 @@ var _ editable.Editable = (*ObjectEditor)(nil)
 
 type ObjectEditor struct{}
 
-func (s *ObjectEditor) Format(rule *system.RuleWrapper) editable.Format {
+func (s *ObjectEditor) EditorFormat(rule *system.RuleWrapper) editable.Format {
 	return editable.Block
 }
 
@@ -98,8 +99,8 @@ func (v *ObjectEditorView) Render() vecty.Component {
 									})
 								}).PreventDefault(),
 								elem.Italic(
+									styles.DropdownIcon(),
 									vecty.ClassMap{
-										"dropdown-icon":       true,
 										"glyphicon":           true,
 										"glyphicon-check":     v.node.ShowSystemControls,
 										"glyphicon-unchecked": !v.node.ShowSystemControls,
@@ -156,7 +157,8 @@ func (v *ObjectEditorView) Render() vecty.Component {
 	if v.node.ShowSystemControls {
 		sections = append(sections,
 			elem.Div(
-				prop.Class("well object-editor"),
+				vecty.Style("padding-bottom", "0"),
+				prop.Class("well"),
 				views.NewEditorListView(v.Ctx, v.model, system.NewReference("kego.io/system", "object"), []string{"id", "type"}),
 			),
 		)

@@ -18,7 +18,17 @@ const (
 
 type Editable interface {
 	EditorView(ctx context.Context, node *node.Node, format Format) vecty.Component
-	Format(rule *system.RuleWrapper) Format
+	EditorFormat(rule *system.RuleWrapper) Format
+}
+
+type EditableArray interface {
+	EditorViewArray(ctx context.Context, node *node.Node, format Format) vecty.Component
+	EditorFormatArray(rule *system.RuleWrapper) Format
+}
+
+type EditableMap interface {
+	EditorViewMap(ctx context.Context, node *node.Node, format Format) vecty.Component
+	EditorFormatMap(rule *system.RuleWrapper) Format
 }
 
 type EditsExtraEmbeddedTypes interface {

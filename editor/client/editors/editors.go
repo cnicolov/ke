@@ -11,6 +11,7 @@ import (
 	"github.com/davelondon/vecty/prop"
 	"kego.io/editor/client/clientctx"
 	"kego.io/editor/client/models"
+	"kego.io/json"
 	"kego.io/system"
 	"kego.io/system/node"
 )
@@ -20,20 +21,21 @@ func Register(ctx context.Context) {
 	// for system types so we use this method instead.
 	editors := clientctx.FromContext(ctx)
 
-	editors.Set("string", new(StringEditor))
-	editors.Set("kego.io/json:string", new(StringEditor))
-	editors.Set("kego.io/system:string", new(StringEditor))
+	editors.Set("string", "", json.J_OBJECT, new(StringEditor))
+	editors.Set("kego.io/json", "string", json.J_OBJECT, new(StringEditor))
+	editors.Set("kego.io/system", "string", json.J_OBJECT, new(StringEditor))
 
-	editors.Set("number", new(NumberEditor))
-	editors.Set("kego.io/json:number", new(NumberEditor))
-	editors.Set("kego.io/system:number", new(NumberEditor))
-	editors.Set("kego.io/system:int", new(NumberEditor))
+	editors.Set("number", "", json.J_OBJECT, new(NumberEditor))
+	editors.Set("kego.io/json", "number", json.J_OBJECT, new(NumberEditor))
+	editors.Set("kego.io/system", "number", json.J_OBJECT, new(NumberEditor))
+	editors.Set("kego.io/system", "int", json.J_OBJECT, new(NumberEditor))
 
-	editors.Set("bool", new(BoolEditor))
-	editors.Set("kego.io/json:bool", new(BoolEditor))
-	editors.Set("kego.io/system:bool", new(BoolEditor))
+	editors.Set("bool", "", json.J_OBJECT, new(BoolEditor))
+	editors.Set("kego.io/json", "bool", json.J_OBJECT, new(BoolEditor))
+	editors.Set("kego.io/system", "bool", json.J_OBJECT, new(BoolEditor))
 
-	editors.Set("kego.io/system:object", new(ObjectEditor))
+	editors.Set("kego.io/system", "object", json.J_OBJECT, new(ObjectEditor))
+	editors.Set("kego.io/system", "tag", json.J_ARRAY, new(TagEditor))
 }
 
 func helpBlock(ctx context.Context, n *node.Node) vecty.Markup {

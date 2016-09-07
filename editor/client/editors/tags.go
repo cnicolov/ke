@@ -1,10 +1,6 @@
 package editors
 
 import (
-	"fmt"
-
-	"strconv"
-
 	"time"
 
 	"context"
@@ -24,19 +20,19 @@ import (
 	"kego.io/system/node"
 )
 
-var _ editable.Editable = (*NumberEditor)(nil)
+var _ editable.EditableArray = (*TagEditor)(nil)
 
-type NumberEditor struct{}
+type TagEditor struct{}
 
-func (s *NumberEditor) EditorFormat(rule *system.RuleWrapper) editable.Format {
-	return editable.Inline
+func (e *TagEditor) EditorFormatArray(rule *system.RuleWrapper) editable.Format {
+	return editable.Block
 }
 
-func (s *NumberEditor) EditorView(ctx context.Context, node *node.Node, format editable.Format) vecty.Component {
-	return NewNumberEditorView(ctx, node, format)
+func (e *TagEditor) EditorViewArray(ctx context.Context, node *node.Node, format editable.Format) vecty.Component {
+	return NewTagEditorView(ctx, node, format)
 }
 
-type NumberEditorView struct {
+type TagEditorView struct {
 	*views.View
 
 	model  *models.EditorModel
@@ -45,8 +41,8 @@ type NumberEditorView struct {
 	format editable.Format
 }
 
-func NewNumberEditorView(ctx context.Context, node *node.Node, format editable.Format) *NumberEditorView {
-	v := &NumberEditorView{}
+func NewTagEditorView(ctx context.Context, node *node.Node, format editable.Format) *TagEditorView {
+	v := &TagEditorView{}
 	v.View = views.New(ctx, v)
 	v.model = v.App.Editors.Get(node)
 	v.node = v.App.Nodes.Get(node)
@@ -59,14 +55,14 @@ func NewNumberEditorView(ctx context.Context, node *node.Node, format editable.F
 	return v
 }
 
-func (v *NumberEditorView) Reconcile(old vecty.Component) {
-	if old, ok := old.(*NumberEditorView); ok {
+func (v *TagEditorView) Reconcile(old vecty.Component) {
+	if old, ok := old.(*TagEditorView); ok {
 		v.Body = old.Body
 	}
 	v.ReconcileBody()
 }
 
-func (v *NumberEditorView) Receive(notif flux.NotifPayload) {
+func (v *TagEditorView) Receive(notif flux.NotifPayload) {
 	defer close(notif.Done)
 	v.ReconcileBody()
 	if notif.Type == stores.NodeFocus {
@@ -74,24 +70,18 @@ func (v *NumberEditorView) Receive(notif flux.NotifPayload) {
 	}
 }
 
-func (v *NumberEditorView) Focus() {
+func (v *TagEditorView) Focus() {
 	v.input.Node().Call("focus")
 }
 
-func (v *NumberEditorView) Render() vecty.Component {
+func (v *TagEditorView) Render() vecty.Component {
 
-	v.input = elem.Input(
-		prop.Type(prop.TypeNumber),
-		prop.Value(fmt.Sprintf("%v", v.model.Node.ValueNumber)),
+	contents := vecty.List{
+		prop.Value(v.model.Node.ValueString),
 		prop.Class("form-control"),
 		event.KeyUp(func(e *vecty.Event) {
 			getVal := func() interface{} {
-				val, err := strconv.ParseFloat(e.Target.Get("value").String(), 64)
-				if err != nil {
-					// if there's an error converting to a float, ignore it
-					return nil
-				}
-				return val
+				return e.Target.Get("value").String()
 			}
 			val := getVal()
 			changed := func() bool {
@@ -111,7 +101,18 @@ func (v *NumberEditorView) Render() vecty.Component {
 				})
 			}()
 		}),
-	)
+	}
+
+	if sr, ok := v.model.Node.Rule.Interface.(*system.StringRule); ok && sr.Long {
+		v.input = elem.TextArea(
+			contents,
+		)
+	} else {
+		v.input = elem.Input(
+			prop.Type(prop.TypeText),
+			contents,
+		)
+	}
 
 	return views.NewEditorView(v.Ctx, v.model.Node).Controls(
 		v.input,

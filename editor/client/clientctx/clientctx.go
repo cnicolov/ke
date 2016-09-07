@@ -6,7 +6,7 @@ import (
 	"context"
 
 	"github.com/davelondon/kerr"
-	"kego.io/editor/client/editable"
+	"kego.io/json"
 )
 
 type ctxKeyType int
@@ -14,7 +14,7 @@ type ctxKeyType int
 var ctxKey ctxKeyType = 0
 
 func NewContext(ctx context.Context) context.Context {
-	return context.WithValue(ctx, ctxKey, &EditorCache{m: map[string]editable.Editable{}})
+	return context.WithValue(ctx, ctxKey, &EditorCache{m: map[string]interface{}{}})
 }
 
 func FromContext(ctx context.Context) *EditorCache {
@@ -35,18 +35,26 @@ func FromContextOrNil(ctx context.Context) *EditorCache {
 
 type EditorCache struct {
 	sync.RWMutex
-	m map[string]editable.Editable
+	m map[string]interface{}
 }
 
-func (c *EditorCache) Get(path string) (editable.Editable, bool) {
+func (c *EditorCache) Get(path string, name string, t json.Type) (interface{}, bool) {
+	k := key{path: path, name: name, typ: t}
 	c.RLock()
 	defer c.RUnlock()
-	e, ok := c.m[path]
+	e, ok := c.m[k]
 	return e, ok
 }
 
-func (c *EditorCache) Set(path string, e editable.Editable) {
+func (c *EditorCache) Set(path string, name string, t json.Type, e interface{}) {
+	k := key{path: path, name: name, typ: t}
 	c.Lock()
 	defer c.Unlock()
-	c.m[path] = e
+	c.m[k] = e
+}
+
+type key struct {
+	path string
+	name string
+	typ  string
 }

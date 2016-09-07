@@ -13,6 +13,7 @@ import (
 	"kego.io/editor/client/editable"
 	"kego.io/editor/client/models"
 	"kego.io/editor/client/stores"
+	"kego.io/editor/client/views/styles"
 	"kego.io/system"
 	"kego.io/system/node"
 )
@@ -62,7 +63,7 @@ func (v *StructFragmentView) Render() vecty.Component {
 	// Get the custom editor for the main type. If it wants to edit more of the
 	// embedded structs, it will implement editable.EditsExtraEmbeddedTypes.
 	var embeddedTypes []*system.Reference
-	mainEditor, err := models.GetEmbedEditable(v.Ctx, v.model.Node, v.origin)
+	mainEditor, err := models.GetEditable(v.Ctx, v.model.Node, v.origin)
 	if err != nil {
 		v.App.Fail <- kerr.Wrap("NCBVRLKXED", err)
 		return nil
@@ -130,7 +131,9 @@ func nullEditor(ctx context.Context, n *node.Node, app *stores.App) *EditorView 
 			prop.Href("#"),
 			event.Click(add).PreventDefault(),
 			elem.Italic(
-				prop.Class("editor-icon editor-icon-after glyphicon glyphicon-plus-sign"),
+				styles.EditorIcon(),
+				styles.MarginLeftInline(),
+				prop.Class("glyphicon glyphicon-plus-sign"),
 			),
 		),
 	).Dropdown(elem.ListItem(

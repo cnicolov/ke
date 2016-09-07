@@ -58,6 +58,7 @@ func Structs(ctx context.Context, env *envctx.Env) (source []byte, err error) {
 			if err := printStructDefinition(ctx, env, g, typ); err != nil {
 				return nil, kerr.Wrap("XKRYMXUIJD", err)
 			}
+
 		}
 
 		if !typ.Interface && !isRule {

@@ -1,12 +1,11 @@
-// info:{"Path":"kego.io/system","Hash":6587440654785274708}
+// info:{"Path":"kego.io/system","Hash":14220283465664375530}
 package system
 
 // ke: {"file": {"notest": true}}
 
 import (
-	"reflect"
-
 	"context"
+	"reflect"
 
 	"kego.io/context/jsonctx"
 )
@@ -125,6 +124,18 @@ type StringRule struct {
 	Pattern *String `json:"pattern"`
 }
 
+// Restriction rules for tags
+type TagRule struct {
+	*Object
+	*Rule
+	// The value of this string is restricted to one of the provided values
+	Enum []string `json:"enum"`
+	// This restricts the value to one of several built-in formats
+	Format *String `json:"format"`
+	// This is a regex to match the value to
+	Pattern *String `json:"pattern"`
+}
+
 // Automatically created basic rule for type
 type TypeRule struct {
 	*Object
@@ -224,6 +235,14 @@ func (o *String) GetString(ctx context.Context) *String {
 	return o
 }
 
+type TagInterface interface {
+	GetTag(ctx context.Context) *Tag
+}
+
+func (o *Tag) GetTag(ctx context.Context) *Tag {
+	return o
+}
+
 // This is the most basic type.
 type Type struct {
 	*Object
@@ -248,7 +267,7 @@ func (o *Type) GetType(ctx context.Context) *Type {
 	return o
 }
 func init() {
-	pkg := jsonctx.InitPackage("kego.io/system", 6587440654785274708)
+	pkg := jsonctx.InitPackage("kego.io/system", 14220283465664375530)
 	pkg.InitType("array", nil, reflect.TypeOf((*ArrayRule)(nil)), nil)
 	pkg.InitType("bool", reflect.TypeOf((*Bool)(nil)), reflect.TypeOf((*BoolRule)(nil)), reflect.TypeOf((*BoolInterface)(nil)).Elem())
 	pkg.InitType("int", reflect.TypeOf((*Int)(nil)), reflect.TypeOf((*IntRule)(nil)), reflect.TypeOf((*IntInterface)(nil)).Elem())
@@ -259,5 +278,6 @@ func init() {
 	pkg.InitType("reference", reflect.TypeOf((*Reference)(nil)), reflect.TypeOf((*ReferenceRule)(nil)), reflect.TypeOf((*ReferenceInterface)(nil)).Elem())
 	pkg.InitType("rule", reflect.TypeOf((*Rule)(nil)), reflect.TypeOf((*RuleRule)(nil)), reflect.TypeOf((*RuleInterface)(nil)).Elem())
 	pkg.InitType("string", reflect.TypeOf((*String)(nil)), reflect.TypeOf((*StringRule)(nil)), reflect.TypeOf((*StringInterface)(nil)).Elem())
+	pkg.InitType("tag", reflect.TypeOf((*Tag)(nil)), reflect.TypeOf((*TagRule)(nil)), reflect.TypeOf((*TagInterface)(nil)).Elem())
 	pkg.InitType("type", reflect.TypeOf((*Type)(nil)), reflect.TypeOf((*TypeRule)(nil)), reflect.TypeOf((*TypeInterface)(nil)).Elem())
 }

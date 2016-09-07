@@ -411,8 +411,8 @@ func (s *BranchStore) InsertNodeBranchModelChild(b *models.BranchModel, n *node.
 	if n.Missing || n.Null {
 		return nil
 	}
-	e := models.GetEditable(s.ctx, n)
-	if e == nil || e.Format(n.Rule) == editable.Branch {
+	e := models.GetEditable(s.ctx, n, nil)
+	if e == nil || e.EditorFormat(n.Rule) == editable.Branch {
 		var child *models.BranchModel
 		if filename == "" {
 			child = s.NewNodeBranchModel(s.ctx, n, name)

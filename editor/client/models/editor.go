@@ -9,6 +9,7 @@ import (
 	"kego.io/context/jsonctx"
 	"kego.io/editor/client/clientctx"
 	"kego.io/editor/client/editable"
+	"kego.io/json"
 	"kego.io/system"
 	"kego.io/system/node"
 )
@@ -22,14 +23,59 @@ func NewEditor(n *node.Node) *EditorModel {
 	return &EditorModel{Node: n}
 }
 
-func GetEmbedEditable(ctx context.Context, node *node.Node, embed *system.Reference) (editable.Editable, error) {
+func GetEditable(ctx context.Context, node *node.Node, embed *system.Reference) (editable.Editable, error) {
+	ed, err := getEditable(ctx, node, embed, json.J_OBJECT)
+	if err != nil {
+		return kerr.Wrap("LCFUAFAOQU", err)
+	}
+	return ed.(editable.Editable)
+}
+
+func GetEditableMap(ctx context.Context, node *node.Node, embed *system.Reference) (editable.EditableMap, error) {
+	ed, err := getEditable(ctx, node, embed, json.J_MAP)
+	if err != nil {
+		return kerr.Wrap("XOYXNHCLBY", err)
+	}
+	return ed.(editable.EditableMap)
+}
+
+func GetEditableArray(ctx context.Context, node *node.Node, embed *system.Reference) (editable.EditableArray, error) {
+	ed, err := getEditable(ctx, node, embed, json.J_ARRAY)
+	if err != nil {
+		return kerr.Wrap("WAGWUFNDVQ", err)
+	}
+	return ed.(editable.EditableArray)
+}
+
+func getEditable(ctx context.Context, node *node.Node, embed *system.Reference, editorType json.Type) (interface{}, error) {
 
 	if node == nil || node.Null || node.Missing {
 		return nil, nil
 	}
 
-	if *node.Type.Id == *embed {
-		return GetEditable(ctx, node), nil
+	// If we're after the editor for the type of the whole struct (not an
+	// embedded struct), or the provided embedded type is nil...
+	if embed == nil || *node.Type.Id == *embed {
+
+		if ed := getEditableMulti(node.Value, editorType); ed != nil {
+			return ed, nil
+		}
+
+		editors := clientctx.FromContext(ctx)
+
+		// Don't do this. Implement the Editable interface instead. We can't do
+		// this for system types so we use this method instead.
+		if e, ok := editors.Get(node.Type.Id.Package, node.Type.Id.Name, editorType); ok {
+			return e, nil
+		}
+
+		if node.JsonType != "" {
+			if e, ok := editors.Get(string(node.JsonType), "", editorType); ok {
+				return e, nil
+			}
+		}
+
+		return nil, nil
 	}
 
 	jcache := jsonctx.FromContext(ctx)
@@ -55,8 +101,7 @@ func GetEmbedEditable(ctx context.Context, node *node.Node, embed *system.Refere
 		return nil, kerr.New("UDBOWYUBER", "Can't find %s field in struct", t)
 	}
 
-	// This is the recommended method of presenting an custom editor.
-	if ed, ok := field.Interface().(editable.Editable); ok {
+	if ed := getEditableMulti(field.Interface(), editorType); ed != nil {
 		return ed, nil
 	}
 
@@ -64,7 +109,7 @@ func GetEmbedEditable(ctx context.Context, node *node.Node, embed *system.Refere
 
 	// Don't do this. Implement the Editable interface instead. We can't do this
 	// for system types so we use this method instead.
-	if e, ok := editors.Get(embed.String()); ok {
+	if e, ok := editors.Get(embed.Package, embed.Name, editorType); ok {
 		return e, nil
 	}
 
@@ -72,30 +117,20 @@ func GetEmbedEditable(ctx context.Context, node *node.Node, embed *system.Refere
 
 }
 
-func GetEditable(ctx context.Context, node *node.Node) editable.Editable {
-
-	if node == nil || node.Null || node.Missing {
-		return nil
-	}
-
-	// This is the recommended method of presenting an custom editor.
-	if ed, ok := node.Value.(editable.Editable); ok {
-		return ed
-	}
-
-	editors := clientctx.FromContext(ctx)
-
-	// Don't do this. Implement the Editable interface instead. We can't do this
-	// for system types so we use this method instead.
-	if e, ok := editors.Get(node.Type.Id.String()); ok {
-		return e
-	}
-
-	if node.JsonType != "" {
-		if e, ok := editors.Get(string(node.JsonType)); ok {
-			return e
+func getEditableMulti(v interface{}, t json.Type) interface{} {
+	switch t {
+	case json.J_OBJECT:
+		if ed, ok := v.(editable.Editable); ok {
+			return ed, nil
+		}
+	case json.J_ARRAY:
+		if ed, ok := v.(editable.EditableArray); ok {
+			return ed, nil
+		}
+	case json.J_MAP:
+		if ed, ok := v.(editable.EditableMap); ok {
+			return ed, nil
 		}
 	}
-
 	return nil
 }

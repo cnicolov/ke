@@ -1,0 +1,32 @@
+{
+	"description": "This is the item type for tags",
+	"type": "type",
+	"id": "tag",
+	"native": "string",
+	"rule": {
+		"description": "Restriction rules for tags",
+		"type": "type",
+		"embed": ["rule"],
+		"fields": {
+			"enum": {
+				"description": "The value of this string is restricted to one of the provided values",
+				"type": "@array",
+				"items": {
+					"type": "json:@string"
+				},
+				"optional": true
+			},
+			"pattern": {
+				"description": "This is a regex to match the value to",
+				"type": "@string",
+				"optional": true
+			},
+			"format": {
+				"description": "This restricts the value to one of several built-in formats",
+				"type": "@string",
+				"enum": ["date-time", "email", "hostname", "ipv4", "ipv6", "uri"],
+				"optional": true
+			}
+		}
+	}
+}

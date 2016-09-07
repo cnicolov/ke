@@ -21,7 +21,7 @@ var _ editable.Editable = (*BoolEditor)(nil)
 
 type BoolEditor struct{}
 
-func (s *BoolEditor) Format(rule *system.RuleWrapper) editable.Format {
+func (s *BoolEditor) EditorFormat(rule *system.RuleWrapper) editable.Format {
 	return editable.Inline
 }
 

@@ -10,6 +10,7 @@ import (
 	"kego.io/editor/client/actions"
 	"kego.io/editor/client/models"
 	"kego.io/editor/client/stores"
+	"kego.io/editor/client/views/styles"
 )
 
 type ViewMenuView struct {
@@ -94,8 +95,8 @@ func (v *ViewMenuView) Render() vecty.Component {
 						v.App.Dispatch(&actions.ToggleInfoState{})
 					}).PreventDefault().StopPropagation(),
 					elem.Italic(
+						styles.DropdownIcon(),
 						vecty.ClassMap{
-							"dropdown-icon":       true,
 							"glyphicon":           true,
 							"glyphicon-check":     v.App.Misc.Info(),
 							"glyphicon-unchecked": !v.App.Misc.Info(),

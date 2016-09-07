@@ -21,7 +21,7 @@ import (
 
 var _ editable.Editable = (*Icon)(nil)
 
-func (s *Icon) Format(rule *system.RuleWrapper) editable.Format {
+func (s *Icon) EditorFormat(rule *system.RuleWrapper) editable.Format {
 	return editable.Block
 }
 
