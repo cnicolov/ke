@@ -23,6 +23,12 @@
 			"default": "object",
 			"optional": true
 		},
+		"underlying": {
+			"description": "If this type is an alias to an non-native underlying type, it should be described here",
+			"type": "@rule",
+			"interface": true,
+			"optional": true
+		},
 		"interface": {
 			"description": "Is this type an interface?",
 			"type": "json:@bool",

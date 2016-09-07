@@ -1,0 +1,11 @@
+{
+  "type": "type",
+  "id": "tags",
+  "native": "array",
+  "underlying": {
+    "type": "@array",
+    "items": {
+      "type": "json:@string"
+    }
+  }
+}

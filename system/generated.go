@@ -1,12 +1,11 @@
-// info:{"Path":"kego.io/system","Hash":6587440654785274708}
+// info:{"Path":"kego.io/system","Hash":17125153217843816377}
 package system
 
 // ke: {"file": {"notest": true}}
 
 import (
-	"reflect"
-
 	"context"
+	"reflect"
 
 	"kego.io/context/jsonctx"
 )
@@ -125,6 +124,12 @@ type StringRule struct {
 	Pattern *String `json:"pattern"`
 }
 
+// Automatically created basic rule for tags
+type TagsRule struct {
+	*Object
+	*Rule
+}
+
 // Automatically created basic rule for type
 type TypeRule struct {
 	*Object
@@ -239,6 +244,8 @@ type Type struct {
 	Native *String `kego:"{\"default\":{\"value\":\"object\"}}" json:"native"`
 	// Type that defines restriction rules for this type.
 	Rule *Type `json:"rule"`
+	// If this type is an alias to an non-native underlying type, it should be described here
+	Underlying RuleInterface `json:"underlying"`
 }
 type TypeInterface interface {
 	GetType(ctx context.Context) *Type
@@ -248,7 +255,7 @@ func (o *Type) GetType(ctx context.Context) *Type {
 	return o
 }
 func init() {
-	pkg := jsonctx.InitPackage("kego.io/system", 6587440654785274708)
+	pkg := jsonctx.InitPackage("kego.io/system", 17125153217843816377)
 	pkg.InitType("array", nil, reflect.TypeOf((*ArrayRule)(nil)), nil)
 	pkg.InitType("bool", reflect.TypeOf((*Bool)(nil)), reflect.TypeOf((*BoolRule)(nil)), reflect.TypeOf((*BoolInterface)(nil)).Elem())
 	pkg.InitType("int", reflect.TypeOf((*Int)(nil)), reflect.TypeOf((*IntRule)(nil)), reflect.TypeOf((*IntInterface)(nil)).Elem())
@@ -259,5 +266,6 @@ func init() {
 	pkg.InitType("reference", reflect.TypeOf((*Reference)(nil)), reflect.TypeOf((*ReferenceRule)(nil)), reflect.TypeOf((*ReferenceInterface)(nil)).Elem())
 	pkg.InitType("rule", reflect.TypeOf((*Rule)(nil)), reflect.TypeOf((*RuleRule)(nil)), reflect.TypeOf((*RuleInterface)(nil)).Elem())
 	pkg.InitType("string", reflect.TypeOf((*String)(nil)), reflect.TypeOf((*StringRule)(nil)), reflect.TypeOf((*StringInterface)(nil)).Elem())
+	pkg.InitType("tags", nil, reflect.TypeOf((*TagsRule)(nil)), nil)
 	pkg.InitType("type", reflect.TypeOf((*Type)(nil)), reflect.TypeOf((*TypeRule)(nil)), reflect.TypeOf((*TypeInterface)(nil)).Elem())
 }
